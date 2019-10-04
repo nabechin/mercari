@@ -51,8 +51,8 @@ public class ItemService {
 		return repository.load(id);
 	}
 
-	public List<Item> findByParentId(int id) {
-		return repository.findByParentId(id);
+	public List<Item> findByParentId(int id, int childParentId, int grandChildParentId) {
+		return repository.findByParentId(id, childParentId, grandChildParentId);
 	}
 
 }

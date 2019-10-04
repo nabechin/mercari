@@ -2,6 +2,8 @@ package com.example.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +25,9 @@ public class CategoryController {
 	
 	@Autowired
 	private ItemService itemService;
+	
+	@Autowired
+	private HttpSession session;
 
 	@ModelAttribute
 	public CategoryForm setUpForm() {
@@ -30,17 +35,17 @@ public class CategoryController {
 	}
 
 	@RequestMapping("/findChildCategory")
-	public String findByParentId(CategoryForm form, Model model) {
+	public String findByParentId(CategoryForm form, Model model,Integer page, Integer nextOrPre) {
+
 		if (form.getParentId() == 0) {
 			List<Category> categoryList = service.findChildCategory(form.getId());
-			List<Item> itemList = itemService.findByParentId(form.getId());
-			model.addAttribute("itemList", itemList);
 			model.addAttribute("childCategoryList", categoryList);
 		} else if (form.getGrandchildParentId() == 0) {
 			List<Category> categoryList = service.findGrandChild(form.getId(), form.getParentId());
 			model.addAttribute("grandChildCategoryList", categoryList);
 		} else if (form.getGrandchildParentId() != 0 && form.getParentId() != 0 && form.getGrandchildParentId() != 0) {
-			System.out.println(form);
+			List<Item> itemList = itemService.findByParentId(form.getId(),form.getParentId(),form.getGrandchildParentId());
+			model.addAttribute("itemList", itemList);
 		}
 		List<Category> categoryList1 = service.findParentCategory();
 		model.addAttribute("categoryList", categoryList1);

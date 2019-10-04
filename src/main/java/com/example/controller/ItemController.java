@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -97,18 +98,7 @@ public class ItemController {
 //	}
 	@RequestMapping("/findByCategory")
 	public String findByCategory(Model model, Integer page, Integer nextOrPre, String nameAll, CategoryForm form) {
-		if (form.getParentId() == 0) {
-			List<Category> categoryList = service.findChildCategory(form.getId());
-			model.addAttribute("childCategoryList", categoryList);
-		} else {
-			List<Category> categoryList = service.findGrandChild(form.getId(), form.getParentId());
-			model.addAttribute("grandChildCategoryList", categoryList);
-		}
-		List<Category> categoryList1 = service.findParentCategory();
-		model.addAttribute("categoryList", categoryList1);
-		List<Category> categoryList2 = service.findChildCategory(form.getId());
-		model.addAttribute("childCategoryList", categoryList2);
-		
+		//ページング機能
 		Integer nowPage = (Integer) session.getAttribute("nowPage");
 		if (nextOrPre != null) {
 			nowPage = nowPage + nextOrPre;
@@ -117,10 +107,39 @@ public class ItemController {
 		if (page == null) {
 			page = 1;
 		}
+		//カテゴリー検索
+//		if (form.getParentId() == 0) {
+//			List<Category> categoryList = service.findChildCategory(form.getId());
+//			model.addAttribute("childCategoryList", categoryList);
+//		} else if (form.getGrandchildParentId() == 0) {
+//			List<Category> categoryList = service.findGrandChild(form.getId(), form.getParentId());
+//			model.addAttribute("grandChildCategoryList", categoryList);
+//		} else if (form.getGrandchildParentId() != 0 && form.getParentId() != 0 && form.getGrandchildParentId() != 0) {
+//			List<Item> itemList = itemService.findByParentId(form.getId(),form.getParentId(),form.getGrandchildParentId());
+//			model.addAttribute("itemList", itemList);
+//		}
+//		List<Category> categoryList1 = service.findParentCategory();
+//		model.addAttribute("categoryList", categoryList1);
+//		List<Category> categoryList2 = service.findChildCategory(form.getId());
+//		model.addAttribute("childCategoryList", categoryList2);
+//		List<Category> categoryList3 = service.findGrandChild(form.getId(), form.getParentId());
+//		model.addAttribute("grandChildCategoryList", categoryList3);
+		
+		
 //		List<Item> itemList = null;
+		//カテゴリー検索（商品一覧から)
 		String nameAllForPaging = (String) session.getAttribute("nameAll");
 		if (nameAllForPaging != null && nameAll != null) {
 			List<Item> itemList = itemService.findByCategory(page, nameAll);
+			//プルダウンへの反映
+			Category category = new Category();
+			List<Category> categoryList = new ArrayList();
+			List<Category> childCategoryList = service.findChildCategory(itemList.get(0).getCategoryId());
+			category.setName(itemList.get(0).getBigCategory());
+			category.setId(itemList.get(0).getCategoryId());
+			categoryList.add(category);
+			model.addAttribute("categoryList",categoryList);
+			model.addAttribute("childCategoryList", childCategoryList);
 			model.addAttribute("itemList", itemList);
 			session.setAttribute("nowPage", page);
 			session.setAttribute("nameAll", nameAll);

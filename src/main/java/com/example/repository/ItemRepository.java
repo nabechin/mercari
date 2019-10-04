@@ -74,9 +74,17 @@ public class ItemRepository {
 		return item;
 	}
 
-	public List<Item> findByParentId(int id) {
-
-		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
+	public List<Item> findByParentId(int id, int childParentId, int grandChildParentId) {
+		String Sql = "SELECT i.id AS i_id,i.name AS i_name,i.condition AS i_condition,"
+				+ " i.category_id AS i_category_id,i.brand AS i_brand,i.price AS i_price,i.shipping AS i_shipping,"
+				+ "i.description AS i_description,split_part(c.name_all,'/',1) AS c_bigCategory,"
+				+ " split_part(c.name_all,'/',2) AS c_middleCategory,"
+				+ "split_part(c.name_all,'/',3) AS c_smallCategory,c.name_all AS c_name_all "
+				+ "from items i left outer join category c on i.category_id = c.id where  c.id in "
+				+ "(select :grandChildParentId from category where parent in "
+				+ "(select :childParentId from category where parent in " + "(select id from category where id=:id)))";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id)
+				.addValue("childParentId", childParentId).addValue("grandChildParentId", grandChildParentId);
 		List<Item> itemList = template.query(Sql, param, ITEM_ROW_MAPPER);
 		return itemList;
 	}
