@@ -2,6 +2,7 @@ package com.example.repository;
 
 import java.util.List;
 
+import com.example.form.SearchForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -39,6 +40,14 @@ public class ItemRepository {
 		item.setNameAll(rs.getString("c_name_all"));
 		return item;
 	};
+
+	public List<Item> search(SearchForm searchForm) {
+		// TODO
+		// 検索条件を加味した検索
+
+		return null;
+	}
+
 
 	public List<Item> findAllByPage(Integer page) {
 		int selectPage = 30 * (page - 1);

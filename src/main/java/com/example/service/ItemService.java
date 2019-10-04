@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.Collections;
 import java.util.List;
 
+import com.example.form.SearchForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +24,10 @@ public class ItemService {
 
 	@Autowired
 	private ItemRepository repository;
+
+	public List<Item> search(SearchForm searchForm) {
+		return repository.search(searchForm);
+	}
 
 	public List<Item> findAllByPage(Integer page) {
 		return repository.findAllByPage(page);

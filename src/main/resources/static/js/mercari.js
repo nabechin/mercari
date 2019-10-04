@@ -1,8 +1,6 @@
 $(function() {
-	$("#parent").on("change", function() {
-		$("#form").submit();
-	});
-	$("#childParent").on("change", function() {
+	$(".category-select").on("change", function() {
+		$("#form [name=action]").val('category');
 		$("#form").submit();
 	});
 });

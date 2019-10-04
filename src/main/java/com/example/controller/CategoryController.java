@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.Category;
 import com.example.domain.Item;
-import com.example.form.CategoryForm;
+import com.example.form.SearchForm;
 import com.example.service.CategoryService;
 import com.example.service.ItemService;
 
@@ -21,7 +21,7 @@ import com.example.service.ItemService;
 public class CategoryController {
 
 	@Autowired
-	private CategoryService service;
+	private CategoryService categoryService;
 	
 	@Autowired
 	private ItemService itemService;
@@ -30,29 +30,30 @@ public class CategoryController {
 	private HttpSession session;
 
 	@ModelAttribute
-	public CategoryForm setUpForm() {
-		return new CategoryForm();
+	public SearchForm setUpForm() {
+		return new SearchForm();
 	}
 
-	@RequestMapping("/findChildCategory")
-	public String findByParentId(CategoryForm form, Model model,Integer page, Integer nextOrPre) {
+	@RequestMapping("/search")
+	public String search(SearchForm searchForm, Model model) {
 
-		if (form.getParentId() == 0) {
-			List<Category> categoryList = service.findChildCategory(form.getId());
-			model.addAttribute("childCategoryList", categoryList);
-		} else if (form.getGrandchildParentId() == 0) {
-			List<Category> categoryList = service.findGrandChild(form.getId(), form.getParentId());
-			model.addAttribute("grandChildCategoryList", categoryList);
-		} else if (form.getGrandchildParentId() != 0 && form.getParentId() != 0 && form.getGrandchildParentId() != 0) {
-			List<Item> itemList = itemService.findByParentId(form.getId(),form.getParentId(),form.getGrandchildParentId());
-			model.addAttribute("itemList", itemList);
+        List<Category> chuCategoryList = null;
+        List<Category> syoCategoryList = null;
+		// で？カテゴリーは何を返せばいい？
+		//  ⇒　指定されたカテゴリの子供のカテゴリーまで検索すればOK
+		if (searchForm.getDaiCategoryId() != null) {
+			chuCategoryList = categoryService.findChildCategory(searchForm.getDaiCategoryId());
 		}
-		List<Category> categoryList1 = service.findParentCategory();
-		model.addAttribute("categoryList", categoryList1);
-		List<Category> categoryList2 = service.findChildCategory(form.getId());
-		model.addAttribute("childCategoryList", categoryList2);
-		List<Category> categoryList3 = service.findGrandChild(form.getId(), form.getParentId());
-		model.addAttribute("grandChildCategoryList", categoryList3);
+		if (searchForm.getChuCategoryId() != null) {
+			syoCategoryList = categoryService.findChildCategory(searchForm.getChuCategoryId());
+		}
+		// 商品
+		if (searchForm.getAction().equals("item")) {
+			List<Item> itemList = itemService.search(searchForm);
+			session.setAttribute("itemList", itemList);
+		}
+		model.addAttribute("chuCategoryList", chuCategoryList);
+        model.addAttribute("syoCategoryList", syoCategoryList);
 		return "list";
 
 	}

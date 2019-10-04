@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.Category;
 import com.example.domain.Item;
-import com.example.form.CategoryForm;
+import com.example.form.SearchForm;
 import com.example.form.ItemReceiveForm;
 import com.example.service.CategoryService;
 import com.example.service.ItemService;
@@ -45,59 +45,25 @@ public class ItemController {
 	}
 
 	@ModelAttribute
-	public CategoryForm setUpForm2() {
-		return new CategoryForm();
+	public SearchForm setUpForm2() {
+		return new SearchForm();
 	}
 
 	@RequestMapping("")
 	public String showItemList(Model model, Integer page) {
-//		Integer nowPage = (Integer) session.getAttribute("nowPage");
-//		
-//		if (nextOrPre != null) {
-//			nowPage = nowPage + nextOrPre;
-//		}
 		if (page == null) {
 			page = 1;
 		}
-//		if (nowPage > 0) {
-//			page = nowPage;
-//		}
-
-		List<Category> categoryList = categoryService.findParentCategory();
-		model.addAttribute("categoryList", categoryList);
-		// List<Item> itemList = null;
+		List<Category> daiCategoryList = categoryService.findParentCategory();
 		List<Item> itemList = itemService.findAllByPage(page);
-//		Page<Item> itemPage =  itemService.showItemPaging(page,VIEW_SIZE,itemList);
-//		int totalPages=itemPage.getTotalPages();
-//		model.addAttribute("totalPages",totalPages);
-//		model.addAttribute("itemPage",itemPage);
-//		
-//		
-//		List<Integer> pageNumbers = calcPageNumbers(model,itemPage);
-//		List<Integer> sortNumbers = new ArrayList();
-//		for(int i=1;i<=5;i++) {
-//			sortNumbers.add(pageNumbers.get(i-1));
-//		}
-//		model.addAttribute("pageNumbers",sortNumbers);
+		session.setAttribute("daiCategoryList", daiCategoryList);
 		session.setAttribute("nowPage", page);
-		model.addAttribute("itemList", itemList);
+		session.setAttribute("itemList", itemList);
 		return "list";
-
 	}
 
-//	private List<Integer> calcPageNumbers(Model model, Page<Item> itemPage) {
-//		int totalPages = itemPage.getTotalPages();
-//		List<Integer> pageNumbers = null;
-//		if (totalPages > 0) {
-//			pageNumbers = new ArrayList<Integer>();
-//			for (int i = 1; i <= totalPages; i++) {
-//				pageNumbers.add(i);
-//			}
-//		}
-//		return pageNumbers;
-//	}
 	@RequestMapping("/findByCategory")
-	public String findByCategory(Model model, Integer page, Integer nextOrPre, String nameAll, CategoryForm form) {
+	public String findByCategory(Model model, Integer page, Integer nextOrPre, String nameAll, SearchForm form) {
 		//ページング機能
 		Integer nowPage = (Integer) session.getAttribute("nowPage");
 		if (nextOrPre != null) {
